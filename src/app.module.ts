@@ -4,9 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import ormConfig from 'config/orm.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AllExceptionsFilter } from './httpExceptionFillter';
 import { UsersModule } from './users/users.module';
-import { TransformationInterceptor } from './responseInterceptor';
+import { GlobalExceptionFilter } from './global-exception-filter';
 
 @Module({
   imports: [
@@ -25,7 +24,7 @@ import { TransformationInterceptor } from './responseInterceptor';
     AppService,
     {
       provide: 'APP_FILLTER',
-      useClass: AllExceptionsFilter,
+      useClass: GlobalExceptionFilter,
     },
   ],
 })
