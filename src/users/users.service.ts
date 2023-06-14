@@ -17,6 +17,8 @@ export class UsersService {
     @InjectRepository(Users)
     private readonly userRepository: Repository<Users>,
   ) {}
+
+  // Tạo tài khoản người dùng
   async create(createUserDto: CreateUserDto) {
     try {
       // Tạo passWord hash
@@ -231,7 +233,7 @@ export class UsersService {
 
   async findAll(type: string) {
     try {
-      const user = await this.userRepository.find({ where: { type: type } });
+      const user = await this.userRepository.findBy({ type: type });
       return {
         success: true,
         message: 'Tìm thành công',
