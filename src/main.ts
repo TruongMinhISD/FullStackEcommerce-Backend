@@ -1,13 +1,14 @@
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { TransformationInterceptor } from './responseInterceptor';
-import { AllExceptionsFilter } from './httpExceptionFillter';
+import { ValidationPipe } from '@nestjs/common';
+import { GlobalExceptionFilter } from './global-exception-filter';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const httpAdapter = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
-  app.useGlobalInterceptors(new TransformationInterceptor());
+  app.use(cookieParser());
+  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new GlobalExceptionFilter());
   await app.listen(3000);
 }
 bootstrap();

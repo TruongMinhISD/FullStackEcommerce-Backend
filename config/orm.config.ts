@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Users } from 'src/users/entities/user.entity';
+import { Users } from 'src/users/Entities/user.entity';
 
 export default registerAs(
   'orm.config',

@@ -1,21 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
   Res,
-  UseInterceptors,
-  UseFilters,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
+import { Roles } from 'src/shared/middleware/role.decorators';
+import { CreateUserDto, Role } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -44,14 +45,55 @@ export class UsersController {
     return loginRes;
   }
 
+  @Get('/verify-email/:otp/:email')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmail(@Param('otp') otp: string, @Param('email') email: string) {
+    return await this.usersService.verifyEmail(email, otp);
+  }
+
+  @Get('/resend-otp/:email')
+  @HttpCode(HttpStatus.OK)
+  async resendOtp(@Param('email') email: string) {
+    return await this.usersService.resendOtp(email);
+  }
+
+  @Put('/logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(@Res() response: Response) {
+    response.clearCookie('_digi_auth_token');
+    return response.json({
+      success: true,
+      message: 'Đăng xuất thành công',
+    });
+  }
+  // reset password
+  // Quên mật khẩu
+  @Get('/reset-password/:email')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Param('email') email: string) {
+    return await this.usersService.resetPassword(email);
+  }
+
+  // Update name and password
+  @Patch('/update-name-password/:id')
+  @HttpCode(HttpStatus.OK)
+  async updateNamePassword(
+    @Param('id') id: string,
+    @Body() updateNamePassword: UpdateUserDto,
+  ) {
+    return await this.usersService.updateNamePassword(id, updateNamePassword);
+  }
+
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Roles(Role.ADMIN)
+  async findAll(@Query('type') type: string) {
+    return this.usersService.findAll(type);
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
